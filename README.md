@@ -80,6 +80,11 @@ Get detailed information with verbose mode:
 countgpt -v file.txt
 ```
 
+Visualize tokens with colorful highlighting:
+```bash
+countgpt -c file.txt
+```
+
 ## Examples
 
 Basic token count:
@@ -106,6 +111,17 @@ Counting from piped input:
 $ echo "How many tokens is this?" | countgpt
 4
 ```
+
+Colorful token visualization:
+```bash
+$ countgpt -c example.txt
+```
+
+<p align="center">
+  <img src="countgpt/assets/counttokens.png" alt="Colorful Token Visualization" width="800">
+</p>
+
+This visualization mode helps you see exactly how your text is tokenized by the model.
 
 ## Available Models
 
@@ -196,6 +212,7 @@ Usage: countgpt [OPTIONS] [FILES]...
       countgpt file.txt
       countgpt file1.txt file2.md
       countgpt --model gpt-4 file.txt
+      countgpt -c file.txt           # Visualize tokens with colors
       cat file.txt | countgpt
       echo "Hello world" | countgpt
 
@@ -203,6 +220,7 @@ Options:
   -m, --model TEXT  Tokenizer model or LLM model name. Default: cl100k_base
   -v, --verbose     Show detailed information
   -l, --list-models List all supported models and exit
+  -c, --visualize   Visualize tokens with colorful output
   --help            Show this message and exit
 ```
 

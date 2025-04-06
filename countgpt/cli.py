@@ -10,6 +10,7 @@ from .models import (
     get_supported_llm_models,
     get_encoding_for_model
 )
+from .visualize import colorize_file, visualize_tokens
 
 
 @click.command()
@@ -19,7 +20,7 @@ from .models import (
 @click.option('--verbose', '-v', is_flag=True, help='Show detailed information')
 @click.option('--list-models', '-l', is_flag=True, help='List all supported models and exit')
 @click.option('--visualize', '-c', is_flag=True, help='Visualize tokens with colorful output')
-def main(files, model, verbose, list_models):
+def main(files, model, verbose, list_models, visualize):
     """Count tokens in text files or from standard input.
     
     You can specify either a tiktoken encoding model (like cl100k_base) or an
@@ -89,7 +90,11 @@ def main(files, model, verbose, list_models):
         tokens = encoding.encode(content)
         token_count = len(tokens)
         
-        if verbose:
+        if visualize:
+            # Show colorful visualization of tokens
+            token_bytes = [encoding.decode_single_token_bytes(token) for token in tokens]
+            visualize_tokens(content, token_bytes)
+        elif verbose:
             click.echo(f"Stdin (piped input):")
             if model != encoding_name:
                 click.echo(f"  Model: {model} (using {encoding_name} tokenizer)")
@@ -112,7 +117,12 @@ def main(files, model, verbose, list_models):
                 token_count = len(tokens)
                 total_tokens += token_count
                 
-                if verbose:
+                if visualize:
+                    # Show colorful visualization of tokens
+                    click.echo(f"\n{path}:")
+                    token_bytes = [encoding.decode_single_token_bytes(token) for token in tokens]
+                    visualize_tokens(content, token_bytes)
+                elif verbose:
                     click.echo(f"{path}:")
                     if model != encoding_name:
                         click.echo(f"  Model: {model} (using {encoding_name} tokenizer)")
@@ -125,7 +135,7 @@ def main(files, model, verbose, list_models):
             except Exception as e:
                 click.echo(f"Error reading {path}: {str(e)}", err=True)
         
-        if len(files) > 1:
+        if len(files) > 1 and not visualize:
             if verbose:
                 click.echo(f"Total tokens across all files: {total_tokens}")
             else:
