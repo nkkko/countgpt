@@ -1,0 +1,11 @@
+This is a sample text file that we can use to test our token counting utility.
+It contains multiple lines of text with various characters and punctuation.
+
+The number of tokens in this file will depend on the tokenization model used.
+Some models break text into smaller tokens than others.
+
+You can count the tokens in this file by running:
+countgpt example.txt
+
+Or with verbose output:
+countgpt -v example.txt
