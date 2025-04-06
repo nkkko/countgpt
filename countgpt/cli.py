@@ -18,6 +18,7 @@ from .models import (
               help='Tokenizer model or LLM model name. Default: cl100k_base')
 @click.option('--verbose', '-v', is_flag=True, help='Show detailed information')
 @click.option('--list-models', '-l', is_flag=True, help='List all supported models and exit')
+@click.option('--visualize', '-c', is_flag=True, help='Visualize tokens with colorful output')
 def main(files, model, verbose, list_models):
     """Count tokens in text files or from standard input.
     
