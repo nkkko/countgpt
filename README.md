@@ -14,28 +14,50 @@ Tokens are pieces of text that language models like GPT process. They can be as 
 
 There are several ways to install CountGPT:
 
-### Install from GitHub (Recommended)
+### Using pipx (Recommended for macOS and modern systems)
+
+[pipx](https://pypa.github.io/pipx/) installs Python applications in isolated environments while making them available globally. This is the recommended approach for most users:
 
 ```bash
-# Install directly from GitHub
-pip install git+https://github.com/nkkko/countgpt.git
+# Install pipx if you don't have it
+brew install pipx  # macOS
+python -m pip install --user pipx  # Other systems
+
+# Install countgpt
+pipx install git+https://github.com/nkkko/countgpt.git
+
+# Verify installation
+countgpt --list-models
 ```
 
-### Clone and Install
+### Install using pip
+
+```bash
+# Install in user space (recommended)
+pip install --user git+https://github.com/nkkko/countgpt.git
+
+# Install system-wide (may require sudo/admin privileges)
+sudo pip install git+https://github.com/nkkko/countgpt.git
+
+# For macOS with externally managed Python
+pip install --break-system-packages git+https://github.com/nkkko/countgpt.git
+```
+
+### Install from cloned repository
 
 ```bash
 # Clone the repository
 git clone https://github.com/nkkko/countgpt.git
 cd countgpt
 
-# Install in regular mode
-pip install .
+# Install using pipx (recommended)
+pipx install .
 
-# Or install in development mode
-pip install -e .
+# Or install with pip
+pip install .
 ```
 
-### Using the included installation script
+### Development setup (using the included script)
 
 ```bash
 # Clone the repository
@@ -50,10 +72,16 @@ chmod +x install_dev.sh
 source venv/bin/activate
 ```
 
-After installation, you can verify that the tool is working correctly:
+### Troubleshooting Installation
+
+- **"Command not found: countgpt"**: The installation directory might not be in your PATH. Try using `pipx` as it handles this automatically.
+- **"Externally managed environment"**: This occurs on newer Python installations (especially on macOS). Use `pipx` or add `--break-system-packages` to pip commands.
+- **Permission errors**: Use `pip install --user` or `sudo pip install` for system-wide installation.
+
+After installation, verify that the tool is working correctly:
 
 ```bash
-# Check the installed version
+# Verify the installation
 countgpt --list-models
 ```
 
