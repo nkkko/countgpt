@@ -94,7 +94,7 @@ example.txt: 68
 ```
 
 <p align="center">
-  <img src="countgpt/assets/counttokens.png" alt="CountGPT Logo" width="600">
+  <img src="countgpt/assets/counttokens.jpg" alt="CountGPT Logo" width="600">
 </p>
 
 Verbose output:
