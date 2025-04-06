@@ -3,6 +3,7 @@ import sys
 import click
 import tiktoken
 from pathlib import Path
+from typing import List, Dict, Union, Optional, TextIO
 from .models import (
     count_tokens, 
     count_tokens_in_file, 
@@ -20,7 +21,7 @@ from .visualize import colorize_file, visualize_tokens
 @click.option('--verbose', '-v', is_flag=True, help='Show detailed information')
 @click.option('--list-models', '-l', is_flag=True, help='List all supported models and exit')
 @click.option('--visualize', '-c', is_flag=True, help='Visualize tokens with colorful output')
-def main(files, model, verbose, list_models, visualize):
+def main(files, model, verbose, list_models, visualize) -> None:
     """Count tokens in text files or from standard input.
     
     You can specify either a tiktoken encoding model (like cl100k_base) or an
@@ -86,14 +87,24 @@ def main(files, model, verbose, list_models, visualize):
     # Check if we're getting data from pipe or files
     if not files and not sys.stdin.isatty():
         # Read from stdin (pipe)
-        content = sys.stdin.read()
-        tokens = encoding.encode(content)
-        token_count = len(tokens)
+        try:
+            content: str = sys.stdin.read()
+            tokens: List[int] = encoding.encode(content)
+            token_count: int = len(tokens)
+        except UnicodeDecodeError as e:
+            click.echo(f"Error: Could not decode input. Please ensure it is valid UTF-8: {str(e)}", err=True)
+            sys.exit(1)
+        except Exception as e:
+            click.echo(f"Error processing stdin: {str(e)}", err=True)
+            sys.exit(1)
         
         if visualize:
             # Show colorful visualization of tokens
-            token_bytes = [encoding.decode_single_token_bytes(token) for token in tokens]
-            visualize_tokens(content, token_bytes)
+            try:
+                token_bytes: List[bytes] = [encoding.decode_single_token_bytes(token) for token in tokens]
+                visualize_tokens(content, token_bytes)
+            except Exception as e:
+                click.echo(f"Error visualizing tokens: {str(e)}", err=True)
         elif verbose:
             click.echo(f"Stdin (piped input):")
             if model != encoding_name:
@@ -107,21 +118,24 @@ def main(files, model, verbose, list_models, visualize):
     
     elif files:
         # Read from files
-        total_tokens = 0
+        total_tokens: int = 0
         
         for file_path in files:
             path = Path(file_path)
             try:
-                content = path.read_text(encoding='utf-8')
-                tokens = encoding.encode(content)
-                token_count = len(tokens)
+                content: str = path.read_text(encoding='utf-8')
+                tokens: List[int] = encoding.encode(content)
+                token_count: int = len(tokens)
                 total_tokens += token_count
                 
                 if visualize:
                     # Show colorful visualization of tokens
                     click.echo(f"\n{path}:")
-                    token_bytes = [encoding.decode_single_token_bytes(token) for token in tokens]
-                    visualize_tokens(content, token_bytes)
+                    try:
+                        token_bytes: List[bytes] = [encoding.decode_single_token_bytes(token) for token in tokens]
+                        visualize_tokens(content, token_bytes)
+                    except Exception as e:
+                        click.echo(f"Error visualizing tokens: {str(e)}", err=True)
                 elif verbose:
                     click.echo(f"{path}:")
                     if model != encoding_name:
@@ -132,6 +146,10 @@ def main(files, model, verbose, list_models, visualize):
                     click.echo(f"  Character count: {len(content)}")
                 else:
                     click.echo(f"{path}: {token_count}")
+            except UnicodeDecodeError as e:
+                click.echo(f"Error reading {path}: Could not decode file. Please ensure it is valid UTF-8: {str(e)}", err=True)
+            except PermissionError as e:
+                click.echo(f"Error reading {path}: Permission denied: {str(e)}", err=True)
             except Exception as e:
                 click.echo(f"Error reading {path}: {str(e)}", err=True)
         

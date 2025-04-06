@@ -262,6 +262,18 @@ Options:
 
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
+### Type Checking
+
+This project uses type annotations throughout the codebase. You can use mypy to check for type-related issues:
+
+```bash
+# Install mypy
+pip install mypy
+
+# Run type checking
+mypy countgpt/
+```
+
 ## License
 
 MIT

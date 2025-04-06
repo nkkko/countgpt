@@ -1,4 +1,5 @@
 """Token counting functionality for CountGPT."""
+import sys
 import tiktoken
 from pathlib import Path
 from typing import List, Dict, Union, Optional
@@ -138,7 +139,12 @@ def get_encoding_for_model(model_name: str) -> str:
     if model_name in get_available_models():
         return model_name
     
-    # Default to cl100k_base as fallback, but warn
+    # If we reach here, we need to check if it's an unknown model
+    # Let's provide a more informative message about the unknown model,
+    # but still default to cl100k_base as a fallback
+    if not model_name.startswith(tuple(MODEL_PREFIX_TO_ENCODING.keys())) and model_name not in tiktoken.list_encoding_names():
+        print(f"Warning: Unknown model '{model_name}'. Defaulting to cl100k_base encoding.", file=sys.stderr)
+        
     return "cl100k_base"
 
 
@@ -166,7 +172,7 @@ def count_tokens(content: str, model: str = 'cl100k_base') -> int:
         raise ValueError(f"Model '{model}' not found. Available models: {available}")
 
 
-def count_tokens_in_file(file_path: Union[str, Path], model: str = 'cl100k_base') -> Dict:
+def count_tokens_in_file(file_path: Union[str, Path], model: str = 'cl100k_base') -> Dict[str, Union[str, int]]:
     """Count tokens in a file using the specified model.
     
     Args:
@@ -178,17 +184,26 @@ def count_tokens_in_file(file_path: Union[str, Path], model: str = 'cl100k_base'
         
     Raises:
         FileNotFoundError: If the file does not exist
+        PermissionError: If the file cannot be read due to permissions
+        UnicodeDecodeError: If the file contains invalid UTF-8
         ValueError: If the model is not found
     """
     path = Path(file_path)
     if not path.exists():
         raise FileNotFoundError(f"File not found: {path}")
+    if not path.is_file():
+        raise ValueError(f"Not a file: {path}")
     
-    content = path.read_text(encoding='utf-8')
+    try:
+        content = path.read_text(encoding='utf-8')
+    except UnicodeDecodeError as e:
+        raise UnicodeDecodeError(f"Cannot decode file {path}. Ensure it contains valid UTF-8: {str(e)}")
+    except PermissionError as e:
+        raise PermissionError(f"Permission denied when reading {path}: {str(e)}")
     
     # Convert LLM model name to encoding if needed
-    encoding_name = get_encoding_for_model(model)
-    token_count = count_tokens(content, encoding_name)
+    encoding_name: str = get_encoding_for_model(model)
+    token_count: int = count_tokens(content, encoding_name)
     
     return {
         "file": str(path),
