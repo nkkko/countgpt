@@ -12,14 +12,49 @@ Tokens are pieces of text that language models like GPT process. They can be as 
 
 ## Installation
 
-```bash
-# Install from PyPI
-pip install countgpt
+There are several ways to install CountGPT:
 
-# Install from source
-git clone https://github.com/yourusername/countgpt.git
+### Install from GitHub (Recommended)
+
+```bash
+# Install directly from GitHub
+pip install git+https://github.com/nkkko/countgpt.git
+```
+
+### Clone and Install
+
+```bash
+# Clone the repository
+git clone https://github.com/nkkko/countgpt.git
 cd countgpt
+
+# Install in regular mode
 pip install .
+
+# Or install in development mode
+pip install -e .
+```
+
+### Using the included installation script
+
+```bash
+# Clone the repository
+git clone https://github.com/nkkko/countgpt.git
+cd countgpt
+
+# Run the installation script (creates a virtual environment)
+chmod +x install_dev.sh
+./install_dev.sh
+
+# Activate the virtual environment
+source venv/bin/activate
+```
+
+After installation, you can verify that the tool is working correctly:
+
+```bash
+# Check the installed version
+countgpt --list-models
 ```
 
 ## Basic Usage
@@ -52,6 +87,10 @@ Basic token count:
 $ countgpt example.txt
 example.txt: 68
 ```
+
+<p align="center">
+  <img src="countgpt/assets/counttokens.png" alt="CountGPT Logo" width="600">
+</p>
 
 Verbose output:
 ```bash
